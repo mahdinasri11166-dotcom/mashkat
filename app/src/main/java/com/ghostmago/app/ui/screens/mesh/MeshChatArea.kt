@@ -45,7 +45,7 @@ fun MeshChatArea(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
-            .then(listModifier)
+            .then(listModifier),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(vertical = 12.dp)
     ) {
