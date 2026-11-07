@@ -1,6 +1,7 @@
 package com.ghostmago.app.mesh
 
 import android.content.Context
+import android.util.Log
 import com.ghostmago.app.data.AppState
 import com.ghostmago.app.data.MeshRole
 import org.json.JSONObject
@@ -21,6 +22,10 @@ internal class MeshOutbound(
     private val sendPacket: (type: Int, target: String, payload: ByteArray, ttl: Int) -> String,
     private val emitStatus: (String) -> Unit,
 ) {
+    companion object {
+        private const val TAG = "MeshOutbound"
+    }
+
     fun sendText(text: String, targetHash: String = "", ephemeralSec: Int = 0): String {
         if (text.isBlank()) return ""
         val payload = JSONObject().apply {
@@ -93,7 +98,7 @@ internal class MeshOutbound(
             put("call", isCall)
             put("ts", System.currentTimeMillis() / 1000.0)
         }
-        return sendPacket(MeshPacket.TYPE_VOICE, peerHash, encryptPayload(payload.toString()), ttl = 8)
+        return sendPacket(MeshPacket.TYPE_VOICE, peerHash, encryptPayload(payload.toString()), 8)
     }
 
     fun sendCallSignal(
@@ -118,7 +123,7 @@ internal class MeshOutbound(
             }
             put("ts", System.currentTimeMillis() / 1000.0)
         }
-        return sendPacket(MeshPacket.TYPE_PRIVATE, peerHash, encryptPayload(payload.toString()), ttl = 8)
+        return sendPacket(MeshPacket.TYPE_PRIVATE, peerHash, encryptPayload(payload.toString()), 8)
     }
 
     fun sendFile(filename: String, data: ByteArray): String {
@@ -155,7 +160,7 @@ internal class MeshOutbound(
                 put("filename", filename); put("data", b64)
                 put("ts", System.currentTimeMillis() / 1000.0)
             }
-            lastId = sendPacket(MeshPacket.TYPE_CHUNK, "", encryptPayload(payload.toString()), ttl = 8)
+            lastId = sendPacket(MeshPacket.TYPE_CHUNK, "", encryptPayload(payload.toString()), 8)
         }
         return lastId
     }
@@ -201,7 +206,7 @@ internal class MeshOutbound(
             put("nick", nickname)
             put("ts", System.currentTimeMillis() / 1000.0)
         }
-        sendPacket(MeshPacket.TYPE_ACK, toHash, encryptControl(MeshPacket.TYPE_ACK, payload), ttl = 4)
+        sendPacket(MeshPacket.TYPE_ACK, toHash, encryptControl(MeshPacket.TYPE_ACK, payload), 4)
     }
 
     fun sendRemoteWipe(targetHash: String = "*", reason: String = "remote") {
@@ -210,7 +215,7 @@ internal class MeshOutbound(
             return
         }
         val payload = MeshJoinLogic.buildRemoteWipePayload(nickname, reason)
-        sendPacket(MeshPacket.TYPE_REMOTE_WIPE, targetHash, encryptControl(MeshPacket.TYPE_REMOTE_WIPE, payload), ttl = 6)
+        sendPacket(MeshPacket.TYPE_REMOTE_WIPE, targetHash, encryptControl(MeshPacket.TYPE_REMOTE_WIPE, payload), 6)
         emitStatus("دستور پاکسازی از راه دور ارسال شد")
     }
 
