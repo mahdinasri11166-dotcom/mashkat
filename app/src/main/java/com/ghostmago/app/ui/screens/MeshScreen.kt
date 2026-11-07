@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.QrCode
@@ -27,6 +28,7 @@ import com.ghostmago.app.data.RoomStore
 import com.ghostmago.app.data.VerifiedPeers
 import com.ghostmago.app.mesh.InviteQr
 import com.ghostmago.app.mesh.MeshPacket
+import com.ghostmago.app.mesh.PrivateSessionStore
 import com.ghostmago.app.ui.screens.mesh.MeshChatArea
 import com.ghostmago.app.ui.screens.mesh.MeshPendingJoinsCard
 import com.ghostmago.app.ui.screens.mesh.MeshReadOnlyBanner
@@ -74,7 +76,7 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
                 vm.groupPassword = decoded.groupPassword
                 vm.groupId = decoded.groupId.ifBlank { vm.groupId }
                 vm.waitingApproval = true
-                Toast.makeText(context, "دعوتنامه بارگذاری شد", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "دعوت‌نامه بارگذاری شد", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "QR معتبر نیست", Toast.LENGTH_SHORT).show()
             }
@@ -135,7 +137,7 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
             title = { Text("درخواست عضویت جدید", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
             text = {
                 Text(
-                    "کاربر «${vm.joinReqNick}» میخواهد وارد گروه شود.\nتأیید = عضو میشود  |  رد = ورود ممنوع",
+                    "کاربر «${vm.joinReqNick}» می‌خواهد وارد گروه شود.\nتأیید = عضو می‌شود  |  رد = ورود ممنوع",
                     fontSize = 15.sp,
                     lineHeight = 24.sp
                 )
@@ -220,7 +222,7 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
     LaunchedEffect(vm.shouldAutoConnect, vm.groupPassword, vm.groupId) {
         if (vm.shouldAutoConnect && !vm.isSetup && vm.groupPassword.length >= 4) {
             vm.shouldAutoConnect = false
-            vm.status = "آمادهسازی وایفای و مجوزها…"
+            vm.status = "آماده‌سازی وای‌فای و مجوزها…"
             val missing = MeshConnectivity.missingPermissions(context)
             if (missing.isNotEmpty()) {
                 meshPermLauncher.launch(missing)
@@ -228,13 +230,13 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
             }
             var tries = 0
             while (!MeshConnectivity.isWifiEnabled(context) && tries < 12) {
-                vm.status = "وایفای را روشن کنید… ($tries)"
+                vm.status = "وای‌فای را روشن کنید… ($tries)"
                 delay(1000)
                 tries++
             }
             if (!MeshConnectivity.isWifiEnabled(context)) {
-                vm.status = "وایفای خاموش است — روشن کنید و دوباره وصل شوید"
-                Toast.makeText(context, "وایفای لازم است", Toast.LENGTH_LONG).show()
+                vm.status = "وای‌فای خاموش است — روشن کنید و دوباره وصل شوید"
+                Toast.makeText(context, "وای‌فای لازم است", Toast.LENGTH_LONG).show()
             }
             delay(500)
             vm.status = "اتصال خودکار به میزبان…"
@@ -354,7 +356,6 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
                     onlineCount = vm.onlineCount
                 )
 
-
                 MeshReadOnlyBanner(visible = vm.readOnlyMesh)
                 MeshRoomsBar(
                     context = context,
@@ -433,14 +434,14 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
                                     vm.safetyVerified = false
                                 }) { Text("پایان جلسه", color = Danger) }
                             } else {
-                                                                Text("مخاطبین — پیام و ویس", color = TextSecondary, fontSize = 12.sp)
+                                Text("مخاطبین — پیام و ویس", color = TextSecondary, fontSize = 12.sp)
                                 val saved = ChatContacts.list(context)
                                 val contactRows = buildList {
                                     saved.forEach { c -> add(c.hash to c.nick) }
                                     vm.membersList.filter { it.second != vm.nickname }.forEach { add(it) }
                                 }.distinctBy { it.first }
                                 if (contactRows.isEmpty()) {
-                                    Text("هنوز مخاطبی نیست. بعد از تأیید عضویت اینجا میآیند.", color = TextMuted, fontSize = 12.sp)
+                                    Text("هنوز مخاطبی نیست. بعد از تأیید عضویت اینجا می‌آیند.", color = TextMuted, fontSize = 12.sp)
                                 }
                                 contactRows.forEach { (hash, nick) ->
                                     val online = vm.memberStatuses.any { it.nick == nick && it.online } ||
@@ -510,5 +511,3 @@ fun MeshScreen(onBack: () -> Unit, nav: androidx.navigation.NavController? = nul
         }
     }
 }
-
-
